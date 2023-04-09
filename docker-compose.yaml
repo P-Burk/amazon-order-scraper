@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+   mongo:
+      container_name: mongoDB_instance
+      image: mongo:latest
+      ports:
+       - "27017:27017"
+      volumes:
+       - ./db/:/data/db
+      #command: [--auth]
+      restart: always
+      networks:
+        - local_docker_network
+
+networks:
+  local_docker_network:
+    driver: bridge
