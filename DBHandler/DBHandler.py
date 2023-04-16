@@ -1,6 +1,4 @@
 import os
-import pprint
-import typing
 
 from dotenv import load_dotenv, find_dotenv
 from pymongo import MongoClient
