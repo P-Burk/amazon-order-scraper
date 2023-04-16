@@ -25,8 +25,26 @@ class DBHandler:
             print(error_msg)
             print("Failed to connect to MongoDB instance.")
 
-    def read_all(self):
-        output = self.db.orders.find()
+    # close the connection when done
+    def __disconnect(self):
+        self.client.close()
+
+    def __find_document(self, query: dict) -> None | object:
+        """
+        Private method to check collection for documents and return cursor object if documents are found
+        :param query: Dict
+        :return: None or pymongo cursor
+        """
+        document_count = self.db.orders.count_documents(query)
+        if document_count == 0:
+            return None
+        return self.db.orders.find(query)
+
+    def read_all(self, query):
+        output = self.__find_document(query)
+        if output is None:
+            print("No matching document(s) found.")
+            return None
         return output
 
     def insert_order(self, query: dict):
