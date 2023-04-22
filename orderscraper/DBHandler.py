@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv, find_dotenv
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 
 load_dotenv(find_dotenv())
 
@@ -55,3 +55,31 @@ class DBHandler:
         except Exception as error:
             print(error)
             print("Failed to add order to database.")
+
+    def update_orders(self, query: dict, update_data: dict, multiple_orders: bool) -> None | object:
+        """
+        Updates one or many orders.
+        :param query: documents to find.
+        :param update_data: data that will be updated to the order(s).
+        :param multiple_orders: selector for updating a single order or multiple orders.
+        :return: No document(s) found - None.
+                 Single update - the updated document.
+                 Multiple updates - pymongo.returnResult.
+        """
+        if query is None:
+            raise Exception("No data provided for query.")
+        if update_data is None:
+            raise Exception("No data provided for update.")
+
+        update_data = {"$set": update_data}
+
+        # logic for updating a single order
+        if multiple_orders is False:
+            return self.db.orders.find_one_and_update(query, update_data, return_document=ReturnDocument.AFTER)
+
+        # logic for updating multiple orders
+        result = self.db.orders.update_many(query, update_data)
+        if result.modified_count == 0:
+            return None
+        return result
+
