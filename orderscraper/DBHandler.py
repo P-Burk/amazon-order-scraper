@@ -38,7 +38,12 @@ class DBHandler:
             return None
         return self.db.orders.find(query)
 
-    def read_all(self, query):
+    def read_all(self, query: dict) -> None | object:
+        """
+        Returns a cursor containing documents that meet the search query criteria.
+        :param query: Dictionary containing the search criteria.
+        :return: None if no documents are found, otherwise a cursor object.
+        """
         output = self.__find_document(query)
         if output is None:
             print("No matching document(s) found.")
