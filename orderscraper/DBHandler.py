@@ -15,6 +15,16 @@ class DBHandler:
         self.__connect()
         self.db = self.client["amazon_scraper"]
 
+    def __enter__(self):
+        self.__connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.__disconnect()
+        if exc_type:
+            raise exc_type(exc_val)
+        return self
+
     # attempts to connect to the MongoDB database
     def __connect(self):
         try:
