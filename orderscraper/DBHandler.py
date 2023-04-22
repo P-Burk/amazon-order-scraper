@@ -98,7 +98,7 @@ class DBHandler:
             return None
         return result
 
-    def delete(self, query: dict, multiple_orders: bool) -> None | object:
+    def delete_orders(self, query: dict, multiple_orders: bool) -> None | object:
         """
         Deletes one or many orders.
         :param query: documents to find.
