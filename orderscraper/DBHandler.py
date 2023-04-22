@@ -83,3 +83,22 @@ class DBHandler:
             return None
         return result
 
+    def delete(self, query: dict, multiple_orders: bool) -> None | object:
+        """
+        Deletes one or many orders.
+        :param query: documents to find.
+        :param multiple_orders: selector for deleting a single order or multiple orders.
+        :return: No document(s) found - None.
+                 Document(s) deleted - pymongo.deleteResult.
+        """
+        if query is None:
+            raise Exception("No data provided for query.")
+
+        if multiple_orders is False:    # logic for deleting a single order
+            result = self.db.orders.delete_one(query)
+        else:                           # logic for deleting multiple orders
+            result = self.db.orders.delete_many(query)
+
+        if result.deleted_count == 0:
+            return None
+        return result
