@@ -7,8 +7,9 @@ load_dotenv(find_dotenv())
 
 MONGO_USERNAME = os.getenv("MONGODB_USERNAME")
 MONGO_PASSWORD = os.getenv("MONGODB_PASSWORD")
-MONGO_CONNECTION_STRING = f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}" \
-                          f"@scraper0.cipyr9d.mongodb.net/?retryWrites=true&w=majority"
+MONGO_CONNECTION_STRING = os.getenv("MONGODB_CONNECTION_STRING")
+MONGO_CONNECTION_STRING = MONGO_CONNECTION_STRING.replace("<username>", MONGO_USERNAME)
+MONGO_CONNECTION_STRING = MONGO_CONNECTION_STRING.replace("<password>", MONGO_PASSWORD)
 
 class DBHandler:
     def __init__(self):
