@@ -3,6 +3,9 @@ from dotenv import load_dotenv, find_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+
+import time
 
 load_dotenv(find_dotenv())
 
@@ -15,6 +18,7 @@ AMAZON_SIGN_IN_URL = 'https://www.amazon.com/ap/signin?openid.pape.max_auth_age=
                      'checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select' \
                      '&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&'
 AMAZON_ORDER_URL = 'https://www.amazon.com/gp/css/order-history'
+AMAZON_TRANSACTION_URL = 'https://www.amazon.com/cpe/yourpayments/transactions'
 
 def driver_initialize() -> webdriver:
     """
@@ -48,12 +52,29 @@ def amazon_log_in(driver: webdriver, username: str, password: str, url: str) -> 
 
     return driver
 
+
+def scrape_transaction_page(driver: webdriver, url: str) -> webdriver:
+    """
+    Navigates to and scrapes the transaction page and returns the webdriver.
+    :param driver: Webdriver created by selenium.
+    :param url: Amazon transaction page url.
+    :return: instance of the webdriver.
+    """
+    driver.get(url)
+    # TODO 3: Use selenium to scrape the transaction page and get each order
+    order_num = driver.find_elements(By.PARTIAL_LINK_TEXT, 'Order #')
+    for order in order_num:
+        print(order.text)
+    return driver
+
 def main():
     project_driver = driver_initialize()
     amazon_log_in(project_driver, AMAZON_USERNAME, AMAZON_PASSWORD, AMAZON_SIGN_IN_URL)
+    scrape_transaction_page(project_driver, AMAZON_TRANSACTION_URL)
+
+    time.sleep(6)
 
 if __name__ == '__main__':
     main()
 
-# TODO 3: Use selenium to scrape the order page and get each order
 # TODO 4: Use selenium to click on each order and get the order details
