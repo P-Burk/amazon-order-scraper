@@ -69,6 +69,8 @@ def scrape_transaction_page(driver: webdriver, url: str) -> webdriver:
         order = order.text
         order = order.strip('Order #')
         print(order)
+
+    # TODO 4: need to implement page navigation and keeping track of which orders have been scrapped previously
     return driver
 
 def main():
