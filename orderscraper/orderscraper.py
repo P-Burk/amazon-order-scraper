@@ -39,6 +39,10 @@ def amazon_log_in(driver: webdriver, username: str, password: str, url: str) -> 
     :return: instance of the webdriver.
     """
     driver.get(url)
+    # handle captcha if necessary
+    if driver.find_element('id', 'captchacharacters').is_displayed():
+        continue_button = input('Captcha is displayed. Please solve it manually and press enter to continue.')
+
     driver.find_element('id', 'ap_email').send_keys(username)
     driver.find_element('id', 'continue').click()
     driver.find_element('id', 'ap_password').send_keys(password)
@@ -46,9 +50,7 @@ def amazon_log_in(driver: webdriver, username: str, password: str, url: str) -> 
 
     # handle 2FA if necessary
     if driver.find_element('id', 'auth-mfa-otpcode').is_displayed():
-        OPT_CODE = input('Enter your 2FA code: ')
-        driver.find_element('id', 'auth-mfa-otpcode').send_keys(OPT_CODE)
-        driver.find_element('id', 'auth-signin-button').click()
+        continue_button = input('OPT code required. Please enter it manually and press enter to continue.')
 
     return driver
 
@@ -64,7 +66,9 @@ def scrape_transaction_page(driver: webdriver, url: str) -> webdriver:
     # TODO 3: Use selenium to scrape the transaction page and get each order
     order_num = driver.find_elements(By.PARTIAL_LINK_TEXT, 'Order #')
     for order in order_num:
-        print(order.text)
+        order = order.text
+        order = order.strip('Order #')
+        print(order)
     return driver
 
 def main():
