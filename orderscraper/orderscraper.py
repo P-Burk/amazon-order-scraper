@@ -20,6 +20,10 @@ AMAZON_SIGN_IN_URL = 'https://www.amazon.com/ap/signin?openid.pape.max_auth_age=
 AMAZON_ORDER_URL = 'https://www.amazon.com/gp/css/order-history'
 AMAZON_TRANSACTION_URL = 'https://www.amazon.com/cpe/yourpayments/transactions'
 
+month_dict = {'January': '01', 'February': '02', 'March': '03', 'April': '04',
+              'May': '05', 'June': '06', 'July': '07', 'August': '08',
+              'September': '09', 'October': '10', 'November': '11', 'December': '12'}
+
 def driver_initialize() -> webdriver:
     """
     Initializes the webdriver.
@@ -40,8 +44,12 @@ def amazon_log_in(driver: webdriver, username: str, password: str, url: str) -> 
     """
     driver.get(url)
     # handle captcha if necessary
-    if driver.find_element('id', 'captchacharacters').is_displayed():
-        continue_button = input('Captcha is displayed. Please solve it manually and press enter to continue.')
+    try:
+        if driver.find_element('id', 'captchacharacters').is_displayed():
+            continue_button = input('Captcha is displayed. Please solve it manually and press enter to continue.')
+    except Exception as error:
+        print(f"Error: {error}")
+        pass
 
     driver.find_element('id', 'ap_email').send_keys(username)
     driver.find_element('id', 'continue').click()
@@ -49,29 +57,33 @@ def amazon_log_in(driver: webdriver, username: str, password: str, url: str) -> 
     driver.find_element('id', 'signInSubmit').click()
 
     # handle 2FA if necessary
-    if driver.find_element('id', 'auth-mfa-otpcode').is_displayed():
-        continue_button = input('OPT code required. Please enter it manually and press enter to continue.')
-
+    try:
+        if driver.find_element('id', 'auth-mfa-otpcode').is_displayed():
+            continue_button = input('OPT code required. Please enter it manually and press enter to continue.')
+    except Exception as error:
+        print(f"Error: {error}")
+        pass
+    
     return driver
 
 
-def scrape_transaction_page(driver: webdriver, url: str) -> webdriver:
+def scrape_transaction_page(driver: webdriver, url: str) -> webdriver and list[str]:
     """
     Navigates to and scrapes the transaction page and returns the webdriver.
     :param driver: Webdriver created by selenium.
     :param url: Amazon transaction page url.
     :return: instance of the webdriver.
     """
+    order_list = []
     driver.get(url)
     # TODO 3: Use selenium to scrape the transaction page and get each order
-    order_num = driver.find_elements(By.PARTIAL_LINK_TEXT, 'Order #')
-    for order in order_num:
-        order = order.text
-        order = order.strip('Order #')
-        print(order)
+    amazon_orders = driver.find_elements(By.PARTIAL_LINK_TEXT, 'Order #')
+    for order in amazon_orders:
+        order_list.append(order.text.strip('Order #'))
+    print(order_list)
 
     # TODO 4: need to implement page navigation and keeping track of which orders have been scrapped previously
-    return driver
+    return driver, order_list
 
 def main():
     project_driver = driver_initialize()
